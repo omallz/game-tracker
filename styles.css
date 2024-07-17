@@ -1,0 +1,10 @@
+#data-container {
+    background-color: #f0f0f0;
+    padding: 20px;
+    border-radius: 5px;
+}
+.game-item {
+    color: #333;
+    font-size: 18px;
+    margin-bottom: 10px;
+}

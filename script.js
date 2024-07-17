@@ -1,8 +1,11 @@
 function displayData(data) {
     const container = document.getElementById('data-container');
+    container.innerHTML = ''; // Clear previous data
+
     data.forEach(item => {
     const div = document.createElement('div');
-    div.textContent = `Title: ${item.Title}, Genre: ${item.Genre}`;
+    div.classList.add('game-item');
+    div.textContent = `Game: ${item.Title}, Genre: ${item.Genre}`;
     container.appendChild(div);
     });
 }
