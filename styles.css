@@ -1,3 +1,11 @@
+body {
+    font-family: "Inter", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 300;
+    font-style: normal;
+    font-variation-settings: "slnt" 0;
+}
+
 #data-container {
     background-color: #f0f0f0;
     padding: 20px;
@@ -7,4 +15,9 @@
     color: #333;
     font-size: 18px;
     margin-bottom: 10px;
+}
+
+.game-image {
+    max-height: 200px;
+    object-fit: cover;
 }
