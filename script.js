@@ -64,10 +64,11 @@ function displayData(data) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    fetch('https://sheetdb.io/api/v1/x1xfo8ngykrhs?sheet=Backlog&sort_by=gamepassAddDate&sort_order=desc&sort_method=date&sort_date_format=Y-m')
+    fetch('https://gamingbacklog.infinityfreeapp.com/proxy.php')
     .then(response => response.json())
     .then(data => {
         displayData(data);
     })
     .catch(error => console.error('Error:', error));
 });
+
