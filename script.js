@@ -65,10 +65,24 @@ function displayData(data) {
 
 document.addEventListener('DOMContentLoaded', function() {
     fetch('https://gamingbacklog.infinityfreeapp.com/proxy.php')
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
         displayData(data);
     })
-    .catch(error => console.error('Error:', error));
+    .catch(error => {
+        console.error('Error:', error);
+        displayErrorMessage(error);
+    });
 });
 
+function displayErrorMessage(error) {
+    const errorContainer = document.createElement('div');
+    errorContainer.style.color = 'red';
+    errorContainer.textContent = `An error occurred: ${error.message}`;
+    document.body.appendChild(errorContainer);
+}
