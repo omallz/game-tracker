@@ -64,7 +64,14 @@ function displayData(data) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    fetch('https://gamingbacklog.infinityfreeapp.com/proxy.php')
+    fetch('https://gamingbacklog.infinityfreeapp.com/proxy.php', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        mode: 'cors', // Ensure CORS mode is enabled
+        cache: 'no-cache',
+    })
     .then(response => {
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
