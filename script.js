@@ -1,3 +1,12 @@
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('https://gamingbacklog.infinityfreeapp.com/proxy.php')
+    .then(response => response.json())
+    .then(data => {
+        displayData(data);
+    })
+    .catch(error => console.error('Error:', error));
+});
+
 function displayData(data) {
     const container = document.getElementById('data-container');
     container.innerHTML = ''; // Clear previous data
@@ -62,26 +71,3 @@ function displayData(data) {
     });
 
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-    fetch('https://cors-anywhere.herokuapp.com/https://gamingbacklog.infinityfreeapp.com/proxy.php')
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        displayData(data);
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        displayErrorMessage(error);
-    });
-});
-
-function displayErrorMessage(error) {
-    const errorContainer = document.createElement('div');
-    errorContainer.style.color = 'red';
-    errorContainer.textContent = `An error occurred: ${error.message}`;
-    document.body.appendChild(errorContainer);
