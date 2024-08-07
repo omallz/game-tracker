@@ -64,14 +64,7 @@ function displayData(data) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    fetch('https://gamingbacklog.infinityfreeapp.com/proxy.php', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        mode: 'cors', // Ensure CORS mode is enabled
-        cache: 'no-cache',
-    })
+    fetch('https://cors-anywhere.herokuapp.com/https://gamingbacklog.infinityfreeapp.com/proxy.php')
     .then(response => {
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -92,4 +85,3 @@ function displayErrorMessage(error) {
     errorContainer.style.color = 'red';
     errorContainer.textContent = `An error occurred: ${error.message}`;
     document.body.appendChild(errorContainer);
-}
