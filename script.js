@@ -1,34 +1,13 @@
-document.addEventListener('DOMContentLoaded', function() {
-    fetch('https://gamingbacklog.infinityfreeapp.com/proxy.php')
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Data fetched successfully:', data);
-        displayData(data);
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        displayErrorMessage(error);
-    });
-});
-
-function displayErrorMessage(error) {
-    const errorContainer = document.createElement('div');
-    errorContainer.style.color = 'red';
-    errorContainer.textContent = `An error occurred: ${error.message}`;
-    document.body.appendChild(errorContainer);
-}
-
 function displayData(data) {
     const container = document.getElementById('data-container');
     container.innerHTML = ''; // Clear previous data
-    container.classList.add('row', 'g-3', 'row-cols-2', 'row-cols-md-4');
+    container.classList.add('row');
+    container.classList.add('g-3');
+    container.classList.add('row-cols-2');
+    container.classList.add('row-cols-md-4');
 
     data.forEach(item => {
+
         const gameCol = document.createElement('div');
         gameCol.classList.add('col');
 
@@ -38,21 +17,21 @@ function displayData(data) {
         const gameCardBody = document.createElement('div');
         gameCardBody.classList.add('card-body');
 
-        // Image
+        /* image */
         const img = document.createElement('img');
         img.src = 'https://picsum.photos/200/300'; // Placeholder image URL
         img.alt = `${item.gameTitle} cover image`;
-        img.classList.add('card-img-top', 'game-image');
+        img.classList.add('card-img-top','game-image');
 
-        // Game title
+        /* game title */
         const gameCardTitle = document.createElement('h5');
         gameCardTitle.classList.add('card-title');
-        gameCardTitle.textContent = item.gameTitle;
+        gameCardTitle.textContent = `${item.gameTitle}`;
 
-        // Added to GamePass date
+        /* added to gamepass */
         const gameAddedDate = document.createElement('p');
         gameAddedDate.classList.add('card-text');
-        const date = new Date(`${item.gamepassAddDate}-01`); // Add day to create a valid date
+        const date = new Date(item.gamepassAddDate + '-01'); // Add day to create a valid date
         const formattedDate = date.toLocaleString('en-US', { month: 'long', year: 'numeric' });
         gameAddedDate.innerHTML = `<i class="fa-regular fa-calendar-plus fa-fw"></i> ${formattedDate}`;
 
@@ -67,17 +46,28 @@ function displayData(data) {
         } else if (diffMonths >= 6) {
             gameCard.style.backgroundColor = '#fff3cd'; // 6 months or more
         } else {
-            gameCard.style.backgroundColor = '#bcd7ca'; // Recent
+            gameCard.style.backgroundColor = '#bcd7ca'; // recent
         }
 
-        // Append the card, image, and card-body
+        /* Add the card, image and card-body */
         gameCol.appendChild(gameCard);
         gameCard.appendChild(img);
         gameCard.appendChild(gameCardBody);
 
-        // Append the content of card-body
+        /* Add the content of card-body */
         gameCardBody.appendChild(gameCardTitle);
         gameCardBody.appendChild(gameAddedDate);
         container.appendChild(gameCol);
+
     });
+
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('https://sheetdb.io/api/v1/x1xfo8ngykrhs?sheet=Backlog&sort_by=gamepassAddDate&sort_order=desc&sort_method=date&sort_date_format=Y-m')
+    .then(response => response.json())
+    .then(data => {
+        displayData(data);
+    })
+    .catch(error => console.error('Error:', error));
+});
