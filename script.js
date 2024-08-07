@@ -69,5 +69,4 @@ function displayData(data) {
         container.appendChild(gameCol);
 
     });
-
 }
