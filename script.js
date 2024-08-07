@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return response.json();
     })
     .then(data => {
+        console.log('Data fetched successfully:', data);
         displayData(data);
     })
     .catch(error => {
@@ -14,6 +15,13 @@ document.addEventListener('DOMContentLoaded', function() {
         displayErrorMessage(error);
     });
 });
+
+function displayErrorMessage(error) {
+    const errorContainer = document.createElement('div');
+    errorContainer.style.color = 'red';
+    errorContainer.textContent = `An error occurred: ${error.message}`;
+    document.body.appendChild(errorContainer);
+}
 
 function displayData(data) {
     const container = document.getElementById('data-container');
@@ -72,11 +80,4 @@ function displayData(data) {
         gameCardBody.appendChild(gameAddedDate);
         container.appendChild(gameCol);
     });
-}
-
-function displayErrorMessage(error) {
-    const errorContainer = document.createElement('div');
-    errorContainer.style.color = 'red';
-    errorContainer.textContent = `An error occurred: ${error.message}`;
-    document.body.appendChild(errorContainer);
 }
