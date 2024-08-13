@@ -65,9 +65,14 @@ function displayData(data) {
 
 document.addEventListener('DOMContentLoaded', function() {
     fetch('https://gamingbacklog.infinityfreeapp.com/proxy.php')
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok ' + response.statusText);
+        }
+        return response.json();
+    })
     .then(data => {
         displayData(data);
     })
-    .catch(error => console.error('Error:', error));
+    .catch(error => console.error('Error fetching data:', error));
 });
