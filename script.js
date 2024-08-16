@@ -11,7 +11,6 @@ async function fetchSheetdbData() {
         console.error('Error fetching data from SheetDB:', error);
     }
 }
-
 // Function to fetch game data from IGDB
 async function fetchIgdbData(gameTitle) {
     try {
@@ -52,7 +51,9 @@ async function updateGameCards(data) {
         // Fetch cover image from IGDB
         const igdbData = await fetchIgdbData(item.gameTitle);
         if (igdbData && igdbData.length > 0 && igdbData[0].cover) {
-            img.src = igdbData[0].cover.url;
+            // Modify the cover URL to specify the width
+            const coverUrl = igdbData[0].cover.url.replace('t_thumb', 't_cover_big'); // Example size
+            img.src = coverUrl;
         }
 
         /* game title */
