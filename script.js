@@ -1,13 +1,38 @@
-function displayData(data) {
+// Function to fetch game data from SheetDB
+async function fetchSheetdbData() {
+    try {
+        const response = await fetch('https://gaming-backlog-proxy-server-abba15e1c367.herokuapp.com/proxy.php?api=sheetdb');
+        if (!response.ok) {
+            throw new Error('Network response was not ok ' + response.statusText);
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching data from SheetDB:', error);
+    }
+}
+
+// Function to fetch game data from IGDB
+async function fetchIgdbData(gameTitle) {
+    try {
+        const response = await fetch(`https://gaming-backlog-proxy-server-abba15e1c367.herokuapp.com/proxy.php?api=igdb&search=${encodeURIComponent(gameTitle)}`);
+        if (!response.ok) {
+            throw new Error('Network response was not ok ' + response.statusText);
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching data from IGDB:', error);
+    }
+}
+
+// Function to update game cards with fetched data
+async function updateGameCards(data) {
     const container = document.getElementById('data-container');
     container.innerHTML = ''; // Clear previous data
-    container.classList.add('row');
-    container.classList.add('g-3');
-    container.classList.add('row-cols-2');
-    container.classList.add('row-cols-md-4');
+    container.classList.add('row', 'g-3', 'row-cols-2', 'row-cols-md-4');
 
-    data.forEach(item => {
-
+    for (const item of data) {
         const gameCol = document.createElement('div');
         gameCol.classList.add('col');
 
@@ -21,7 +46,13 @@ function displayData(data) {
         const img = document.createElement('img');
         img.src = 'https://picsum.photos/200/300'; // Placeholder image URL
         img.alt = `${item.gameTitle} cover image`;
-        img.classList.add('card-img-top','game-image');
+        img.classList.add('card-img-top', 'game-image');
+
+        // Fetch cover image from IGDB
+        const igdbData = await fetchIgdbData(item.gameTitle);
+        if (igdbData && igdbData.length > 0 && igdbData[0].cover) {
+            img.src = igdbData[0].cover.url;
+        }
 
         /* game title */
         const gameCardTitle = document.createElement('h5');
@@ -58,21 +89,13 @@ function displayData(data) {
         gameCardBody.appendChild(gameCardTitle);
         gameCardBody.appendChild(gameAddedDate);
         container.appendChild(gameCol);
-
-    });
-
+    }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    fetch('https://gaming-backlog-proxy-server-abba15e1c367.herokuapp.com/proxy.php?api=sheetdb')
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok ' + response.statusText);
+    fetchSheetdbData().then(data => {
+        if (data) {
+            updateGameCards(data);
         }
-        return response.json();
-    })
-    .then(data => {
-        displayData(data);
-    })
-    .catch(error => console.error('Error fetching data:', error));
+    }).catch(error => console.error('Error:', error));
 });
