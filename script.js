@@ -64,7 +64,7 @@ function displayData(data) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    fetch('https://gaming-backlog-proxy-server-abba15e1c367.herokuapp.com/proxy.php')
+    fetch('https://gaming-backlog-proxy-server-abba15e1c367.herokuapp.com/proxy.php?api=sheetdb')
     .then(response => {
         if (!response.ok) {
             throw new Error('Network response was not ok ' + response.statusText);
