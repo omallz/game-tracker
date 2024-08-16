@@ -47,6 +47,7 @@ async function updateGameCards(data) {
         img.src = 'https://picsum.photos/200/300'; // Placeholder image URL
         img.alt = `${item.gameTitle} cover image`;
         img.classList.add('card-img-top', 'game-image');
+        img.loading = 'lazy'; // Enable lazy loading
 
         // Fetch cover image from IGDB
         const igdbData = await fetchIgdbData(item.gameTitle);
