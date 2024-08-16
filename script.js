@@ -11,6 +11,7 @@ async function fetchSheetdbData() {
         console.error('Error fetching data from SheetDB:', error);
     }
 }
+
 // Function to fetch game data from IGDB
 async function fetchIgdbData(gameTitle) {
     try {
@@ -48,12 +49,20 @@ async function updateGameCards(data) {
         img.classList.add('card-img-top', 'game-image');
         img.loading = 'lazy'; // Enable lazy loading
 
-        // Fetch cover image from IGDB
+        // Fetch cover image and rating from IGDB
         const igdbData = await fetchIgdbData(item.gameTitle);
-        if (igdbData && igdbData.length > 0 && igdbData[0].cover) {
-            // Modify the cover URL to specify the width
-            const coverUrl = igdbData[0].cover.url.replace('t_thumb', 't_cover_big'); // Example size
-            img.src = coverUrl;
+        if (igdbData && igdbData.length > 0) {
+            if (igdbData[0].cover) {
+                // Modify the cover URL to specify the width
+                const coverUrl = igdbData[0].cover.url.replace('t_thumb', 't_cover_big'); // Example size
+                img.src = coverUrl;
+            }
+            if (igdbData[0].aggregated_rating) {
+                const rating = document.createElement('p');
+                rating.classList.add('card-text');
+                rating.innerHTML = `<i class="fa-regular fa-star fa-fw"></i> Rating: ${igdbData[0].aggregated_rating.toFixed(1)}`;
+                gameCardBody.appendChild(rating);
+            }
         }
 
         /* game title */
