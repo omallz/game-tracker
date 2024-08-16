@@ -49,16 +49,13 @@ async function updateGameCards(data) {
         img.classList.add('card-img-top', 'game-image');
         img.loading = 'lazy'; // Enable lazy loading
 
-        // Fetch cover image, name, and rating from IGDB
+        // Fetch cover image and rating from IGDB
         const igdbData = await fetchIgdbData(item.gameTitle);
         if (igdbData && igdbData.length > 0) {
             if (igdbData[0].cover) {
                 // Modify the cover URL to specify the width
                 const coverUrl = igdbData[0].cover.url.replace('t_thumb', 't_cover_big'); // Example size
                 img.src = coverUrl;
-            }
-            if (igdbData[0].name) {
-                item.gameTitle = igdbData[0].name; // Update game title with IGDB name
             }
             if (igdbData[0].aggregated_rating) {
                 const rating = document.createElement('p');
@@ -67,6 +64,8 @@ async function updateGameCards(data) {
                 gameCardBody.appendChild(rating);
             }
         }
+
+        // switch rating to total_rating?
 
         /* game title */
         const gameCardTitle = document.createElement('h5');
