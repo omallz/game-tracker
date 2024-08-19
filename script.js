@@ -12,10 +12,10 @@ async function fetchSheetdbData() {
     }
 }
 
-// Function to fetch game data from IGDB
-async function fetchIgdbData(gameTitle) {
+// Function to fetch game data from IGDB with pagination
+async function fetchIgdbData(gameTitle, offset = 0, limit = 20) {
     try {
-        const response = await fetch(`https://gaming-backlog-proxy-server-abba15e1c367.herokuapp.com/proxy.php?api=igdb&search=${encodeURIComponent(gameTitle)}`);
+        const response = await fetch(`https://gaming-backlog-proxy-server-abba15e1c367.herokuapp.com/proxy.php?api=igdb&search=${encodeURIComponent(gameTitle)}&offset=${offset}&limit=${limit}`);
         if (!response.ok) {
             throw new Error('Network response was not ok ' + response.statusText);
         }
@@ -104,10 +104,24 @@ async function updateGameCards(data) {
     }
 }
 
+// Function to delay execution
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// Function to load images in batches with rate limiting
+async function loadImagesInBatches(data, batchSize = 8, delayMs = 250) {
+    for (let i = 0; i < data.length; i += batchSize) {
+        const batch = data.slice(i, i + batchSize);
+        await updateGameCards(batch);
+        await delay(delayMs); // Delay between batches to respect rate limits
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     fetchSheetdbData().then(data => {
         if (data) {
-            updateGameCards(data);
+            loadImagesInBatches(data);
         }
     }).catch(error => console.error('Error:', error));
 });
