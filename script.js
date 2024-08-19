@@ -16,7 +16,7 @@ async function fetchSheetdbData() {
     } catch (error) {
         console.error('Error fetching data from SheetDB:', error);
         const cachedData = JSON.parse(localStorage.getItem('gameData'));
-        if (cachedData) {
+        if (Array.isArray(cachedData)) {
             totalItems = cachedData.length; // Set the total number of items
             return cachedData;
         }
@@ -150,7 +150,7 @@ window.addEventListener('scroll', onScroll);
 // Initial load
 document.addEventListener('DOMContentLoaded', function() {
     const cachedData = JSON.parse(localStorage.getItem('gameData'));
-    if (cachedData) {
+    if (Array.isArray(cachedData)) {
         updateGameCards(cachedData.slice(0, pageSize));
         currentPage++;
     }
