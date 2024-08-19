@@ -44,28 +44,27 @@ async function updateGameCards(data) {
 
         /* image */
         const img = document.createElement('img');
-        img.src = 'https://picsum.photos/200/300'; // Placeholder image URL
+        img.src = 'https://via.placeholder.com/200x300?text=Loading...'; // Placeholder image URL
         img.alt = `${item.gameTitle} cover image`;
         img.classList.add('card-img-top', 'game-image');
         img.loading = 'lazy'; // Enable lazy loading
 
         // Fetch cover image and rating from IGDB
-        const igdbData = await fetchIgdbData(item.gameTitle);
-        if (igdbData && igdbData.length > 0) {
-            if (igdbData[0].cover) {
-                // Modify the cover URL to specify the width
-                const coverUrl = igdbData[0].cover.url.replace('t_thumb', 't_cover_big'); // Example size
-                img.src = coverUrl;
+        fetchIgdbData(item.gameTitle).then(igdbData => {
+            if (igdbData && igdbData.length > 0) {
+                if (igdbData[0].cover) {
+                    // Modify the cover URL to specify the width
+                    const coverUrl = igdbData[0].cover.url.replace('t_thumb', 't_cover_big'); // Example size
+                    img.src = coverUrl;
+                }
+                if (igdbData[0].aggregated_rating) {
+                    const rating = document.createElement('p');
+                    rating.classList.add('card-text');
+                    rating.innerHTML = `<i class="fa-regular fa-star fa-fw"></i> Rating: ${igdbData[0].aggregated_rating.toFixed(1)}`;
+                    gameCardBody.appendChild(rating);
+                }
             }
-            if (igdbData[0].aggregated_rating) {
-                const rating = document.createElement('p');
-                rating.classList.add('card-text');
-                rating.innerHTML = `<i class="fa-regular fa-star fa-fw"></i> Rating: ${igdbData[0].aggregated_rating.toFixed(1)}`;
-                gameCardBody.appendChild(rating);
-            }
-        }
-
-        // switch rating to total_rating?
+        }).catch(error => console.error('Error fetching IGDB data:', error));
 
         /* game title */
         const gameCardTitle = document.createElement('h5');
