@@ -1,5 +1,6 @@
 let currentPage = 0;
 const pageSize = 10; // Number of cards to load per page
+let totalItems = 0; // Total number of items available
 
 // Function to fetch game data from SheetDB
 async function fetchSheetdbData() {
@@ -10,11 +11,13 @@ async function fetchSheetdbData() {
         }
         const data = await response.json();
         localStorage.setItem('gameData', JSON.stringify(data)); // Cache data in local storage
+        totalItems = data.length; // Set the total number of items
         return data;
     } catch (error) {
         console.error('Error fetching data from SheetDB:', error);
         const cachedData = JSON.parse(localStorage.getItem('gameData'));
         if (cachedData) {
+            totalItems = cachedData.length; // Set the total number of items
             return cachedData;
         }
     }
@@ -121,21 +124,28 @@ async function loadMoreCards() {
 
     const data = await fetchSheetdbData();
     const start = currentPage * pageSize;
-    const end = start + pageSize;
+    const end = Math.min(start + pageSize, totalItems); // Ensure we don't exceed the total number of items
     const pageData = data.slice(start, end);
 
     await updateGameCards(pageData);
 
     loading.style.display = 'none';
     currentPage++;
+
+    // Stop loading more cards if we've reached the end
+    if (end >= totalItems) {
+        window.removeEventListener('scroll', onScroll);
+    }
 }
 
 // Event listener for scroll
-window.addEventListener('scroll', () => {
+function onScroll() {
     if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
         loadMoreCards();
     }
-});
+}
+
+window.addEventListener('scroll', onScroll);
 
 // Initial load
 document.addEventListener('DOMContentLoaded', function() {
