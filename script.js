@@ -1,3 +1,6 @@
+let currentPage = 0;
+const pageSize = 10; // Number of cards to load per page
+
 // Function to fetch game data from SheetDB
 async function fetchSheetdbData() {
     try {
@@ -29,8 +32,7 @@ async function fetchIgdbData(gameTitle) {
 // Function to update game cards with fetched data
 async function updateGameCards(data) {
     const container = document.getElementById('data-container');
-    container.innerHTML = ''; // Clear previous data
-    container.classList.add('row', 'g-3', 'row-cols-2', 'row-cols-md-4');
+    const fragment = document.createDocumentFragment(); // Use a document fragment for better performance
 
     for (const item of data) {
         const gameCol = document.createElement('div');
@@ -101,14 +103,36 @@ async function updateGameCards(data) {
         /* Add the content of card-body */
         gameCardBody.appendChild(gameCardTitle);
         gameCardBody.appendChild(gameAddedDate);
-        container.appendChild(gameCol);
+        fragment.appendChild(gameCol);
     }
+
+    container.appendChild(fragment); // Append all elements at once for better performance
 }
 
+// Function to load more cards
+async function loadMoreCards() {
+    const loading = document.getElementById('loading');
+    loading.style.display = 'block';
+
+    const data = await fetchSheetdbData();
+    const start = currentPage * pageSize;
+    const end = start + pageSize;
+    const pageData = data.slice(start, end);
+
+    await updateGameCards(pageData);
+
+    loading.style.display = 'none';
+    currentPage++;
+}
+
+// Event listener for scroll
+window.addEventListener('scroll', () => {
+    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
+        loadMoreCards();
+    }
+});
+
+// Initial load
 document.addEventListener('DOMContentLoaded', function() {
-    fetchSheetdbData().then(data => {
-        if (data) {
-            updateGameCards(data);
-        }
-    }).catch(error => console.error('Error:', error));
+    loadMoreCards();
 });
