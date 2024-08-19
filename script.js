@@ -31,7 +31,7 @@ async function fetchIgdbData(gameTitle) {
 
 // Function to update game cards with fetched data
 async function updateGameCards(data) {
-    const container = document.getElementById('data-container');
+    const container = document.getElementById('game-cards-row');
     const fragment = document.createDocumentFragment(); // Use a document fragment for better performance
 
     for (const item of data) {
