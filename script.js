@@ -13,9 +13,9 @@ async function fetchSheetdbData() {
 }
 
 // Function to fetch game data from IGDB with pagination
-async function fetchIgdbData(gameTitle, offset = 0, limit = 20) {
+async function fetchIgdbData(gameTitle) {
     try {
-        const response = await fetch(`https://gaming-backlog-proxy-server-abba15e1c367.herokuapp.com/proxy.php?api=igdb&search=${encodeURIComponent(gameTitle)}&offset=${offset}&limit=${limit}`);
+        const response = await fetch(`https://gaming-backlog-proxy-server-abba15e1c367.herokuapp.com/proxy.php?api=igdb&search=${encodeURIComponent(gameTitle)}`);
         if (!response.ok) {
             throw new Error('Network response was not ok ' + response.statusText);
         }
@@ -26,8 +26,8 @@ async function fetchIgdbData(gameTitle, offset = 0, limit = 20) {
     }
 }
 
-// Function to update game cards with fetched data
-async function updateGameCards(data) {
+// Function to create game cards with placeholder images
+function createGameCards(data) {
     const container = document.getElementById('data-container');
     container.innerHTML = ''; // Clear previous data
     container.classList.add('row', 'g-3', 'row-cols-2', 'row-cols-md-4');
@@ -48,23 +48,6 @@ async function updateGameCards(data) {
         img.alt = `${item.gameTitle} cover image`;
         img.classList.add('card-img-top', 'game-image');
         img.loading = 'lazy'; // Enable lazy loading
-
-        // Fetch cover image and rating from IGDB
-        fetchIgdbData(item.gameTitle).then(igdbData => {
-            if (igdbData && igdbData.length > 0) {
-                if (igdbData[0].cover) {
-                    // Modify the cover URL to specify the width
-                    const coverUrl = igdbData[0].cover.url.replace('t_thumb', 't_cover_big'); // Example size
-                    img.src = coverUrl;
-                }
-                if (igdbData[0].aggregated_rating) {
-                    const rating = document.createElement('p');
-                    rating.classList.add('card-text');
-                    rating.innerHTML = `<i class="fa-regular fa-star fa-fw"></i> Rating: ${igdbData[0].aggregated_rating.toFixed(1)}`;
-                    gameCardBody.appendChild(rating);
-                }
-            }
-        }).catch(error => console.error('Error fetching IGDB data:', error));
 
         /* game title */
         const gameCardTitle = document.createElement('h5');
@@ -104,24 +87,37 @@ async function updateGameCards(data) {
     }
 }
 
+// Function to update images in batches with rate limiting
+async function updateImagesInBatches(data, batchSize = 8, delayMs = 250) {
+    for (let i = 0; i < data.length; i += batchSize) {
+        const batch = data.slice(i, i + batchSize);
+        for (const item of batch) {
+            const img = document.querySelector(`img[alt="${item.gameTitle} cover image"]`);
+            if (img) {
+                const igdbData = await fetchIgdbData(item.gameTitle);
+                if (igdbData && igdbData.length > 0) {
+                    if (igdbData[0].cover) {
+                        // Modify the cover URL to specify the width
+                        const coverUrl = igdbData[0].cover.url.replace('t_thumb', 't_cover_big'); // Example size
+                        img.src = coverUrl;
+                    }
+                }
+            }
+        }
+        await delay(delayMs); // Delay between batches to respect rate limits
+    }
+}
+
 // Function to delay execution
 function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// Function to load images in batches with rate limiting
-async function loadImagesInBatches(data, batchSize = 8, delayMs = 250) {
-    for (let i = 0; i < data.length; i += batchSize) {
-        const batch = data.slice(i, i + batchSize);
-        await updateGameCards(batch);
-        await delay(delayMs); // Delay between batches to respect rate limits
-    }
-}
-
 document.addEventListener('DOMContentLoaded', function() {
     fetchSheetdbData().then(data => {
         if (data) {
-            loadImagesInBatches(data);
+            createGameCards(data);
+            updateImagesInBatches(data);
         }
     }).catch(error => console.error('Error:', error));
 });
