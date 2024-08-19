@@ -1,7 +1,3 @@
-let currentPage = 0;
-const pageSize = 10; // Number of cards to load per page
-let totalItems = 0; // Total number of items available
-
 // Function to fetch game data from SheetDB
 async function fetchSheetdbData() {
     try {
@@ -10,16 +6,9 @@ async function fetchSheetdbData() {
             throw new Error('Network response was not ok ' + response.statusText);
         }
         const data = await response.json();
-        localStorage.setItem('gameData', JSON.stringify(data)); // Cache data in local storage
-        totalItems = data.length; // Set the total number of items
         return data;
     } catch (error) {
         console.error('Error fetching data from SheetDB:', error);
-        const cachedData = JSON.parse(localStorage.getItem('gameData'));
-        if (Array.isArray(cachedData)) {
-            totalItems = cachedData.length; // Set the total number of items
-            return cachedData;
-        }
     }
 }
 
@@ -39,8 +28,9 @@ async function fetchIgdbData(gameTitle) {
 
 // Function to update game cards with fetched data
 async function updateGameCards(data) {
-    const container = document.getElementById('game-cards-row');
-    const fragment = document.createDocumentFragment(); // Use a document fragment for better performance
+    const container = document.getElementById('data-container');
+    container.innerHTML = ''; // Clear previous data
+    container.classList.add('row', 'g-3', 'row-cols-2', 'row-cols-md-4');
 
     for (const item of data) {
         const gameCol = document.createElement('div');
@@ -111,48 +101,14 @@ async function updateGameCards(data) {
         /* Add the content of card-body */
         gameCardBody.appendChild(gameCardTitle);
         gameCardBody.appendChild(gameAddedDate);
-        fragment.appendChild(gameCol);
-    }
-
-    container.appendChild(fragment); // Append all elements at once for better performance
-}
-
-// Function to load more cards
-async function loadMoreCards() {
-    const loading = document.getElementById('loading');
-    loading.style.display = 'block';
-
-    const data = await fetchSheetdbData();
-    const start = currentPage * pageSize;
-    const end = Math.min(start + pageSize, totalItems); // Ensure we don't exceed the total number of items
-    const pageData = data.slice(start, end);
-
-    await updateGameCards(pageData);
-
-    loading.style.display = 'none';
-    currentPage++;
-
-    // Stop loading more cards if we've reached the end
-    if (end >= totalItems) {
-        window.removeEventListener('scroll', onScroll);
+        container.appendChild(gameCol);
     }
 }
 
-// Event listener for scroll
-function onScroll() {
-    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
-        loadMoreCards();
-    }
-}
-
-window.addEventListener('scroll', onScroll);
-
-// Initial load
 document.addEventListener('DOMContentLoaded', function() {
-    const cachedData = JSON.parse(localStorage.getItem('gameData'));
-    if (Array.isArray(cachedData)) {
-        updateGameCards(cachedData.slice(0, pageSize));
-        currentPage++;
-    }
-    loadMoreCards();
+    fetchSheetdbData().then(data => {
+        if (data) {
+            updateGameCards(data);
+        }
+    }).catch(error => console.error('Error:', error));
 });
