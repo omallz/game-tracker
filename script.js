@@ -9,9 +9,14 @@ async function fetchSheetdbData() {
             throw new Error('Network response was not ok ' + response.statusText);
         }
         const data = await response.json();
+        localStorage.setItem('gameData', JSON.stringify(data)); // Cache data in local storage
         return data;
     } catch (error) {
         console.error('Error fetching data from SheetDB:', error);
+        const cachedData = JSON.parse(localStorage.getItem('gameData'));
+        if (cachedData) {
+            return cachedData;
+        }
     }
 }
 
@@ -134,5 +139,10 @@ window.addEventListener('scroll', () => {
 
 // Initial load
 document.addEventListener('DOMContentLoaded', function() {
+    const cachedData = JSON.parse(localStorage.getItem('gameData'));
+    if (cachedData) {
+        updateGameCards(cachedData.slice(0, pageSize));
+        currentPage++;
+    }
     loadMoreCards();
 });
