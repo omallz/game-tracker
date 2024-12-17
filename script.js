@@ -16,7 +16,7 @@ async function fetchSheetdbData() {
 async function fetchIgdbData(gameTitle) {
     try {
         const encodedTitle = encodeURIComponent(gameTitle);
-        const response = await fetch(`https://gaming-backlog-proxy-server-abba15e1c367.herokuapp.com/proxy.php?api=igdb&search=${encodedTitle}`);
+        const response = await fetch(`https://gaming-backlog-proxy-server-abba15e1c367.herokuapp.com/proxy.php?api=igdb&search="${encodedTitle}"`);
         if (!response.ok) {
             throw new Error('Network response was not ok ' + response.statusText);
         }
@@ -27,7 +27,7 @@ async function fetchIgdbData(gameTitle) {
             console.log(`No data found for "${gameTitle}". Trying alternative queries.`);
             // Optionally, try a simplified query or different format
             const altTitle = gameTitle.replace(':', '');
-            const altResponse = await fetch(`https://gaming-backlog-proxy-server-abba15e1c367.herokuapp.com/proxy.php?api=igdb&search=${encodeURIComponent(altTitle)}`);
+            const altResponse = await fetch(`https://gaming-backlog-proxy-server-abba15e1c367.herokuapp.com/proxy.php?api=igdb&search="${altTitle}"`);
             const altData = await altResponse.json();
             console.log('IGDB Data for alternative title', altTitle, altData);
             return altData;
@@ -38,6 +38,7 @@ async function fetchIgdbData(gameTitle) {
         console.error('Error fetching data from IGDB:', error);
     }
 }
+
 
 // Function to create game cards with placeholder images
 function createGameCards(data) {
