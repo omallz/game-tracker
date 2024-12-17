@@ -21,7 +21,6 @@ async function fetchIgdbData(gameTitle) {
             throw new Error('Network response was not ok ' + response.statusText);
         }
         const data = await response.json();
-        console.log('IGDB Data for', gameTitle, data); // Log the IGDB data
         return data;
     } catch (error) {
         console.error('Error fetching data from IGDB:', error);
@@ -48,7 +47,6 @@ function createGameCards(data) {
         const img = document.createElement('img');
         img.src = 'https://via.placeholder.com/200x300?text=Loading...'; // Placeholder image URL
         img.alt = `${item.gameTitle} cover image`;
-        img.setAttribute('data-title', item.gameTitle); // Add data-title attribute
         img.classList.add('card-img-top', 'game-image');
         img.loading = 'lazy'; // Enable lazy loading
 
@@ -95,7 +93,7 @@ async function updateImagesInBatches(data, batchSize = 8, delayMs = 250) {
     for (let i = 0; i < data.length; i += batchSize) {
         const batch = data.slice(i, i + batchSize);
         for (const item of batch) {
-            const img = document.querySelector(`img[data-title="${item.gameTitle.replace(/"/g, '\\"')}"]`);
+            const img = document.querySelector(`img[alt="${item.gameTitle} cover image"]`);
             if (img) {
                 const igdbData = await fetchIgdbData(item.gameTitle);
                 if (igdbData && igdbData.length > 0) {
