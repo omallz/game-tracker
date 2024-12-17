@@ -17,8 +17,7 @@ async function fetchSheetdbData() {
 // Function to fetch game data from IGDB with pagination
 async function fetchIgdbData(gameTitle) {
     try {
-        const encodedTitle = encodeURIComponent(gameTitle);
-        const response = await fetch(`https://gaming-backlog-proxy-server-abba15e1c367.herokuapp.com/proxy.php?api=igdb&search=${encodedTitle}`);
+        const response = await fetch(`https://gaming-backlog-proxy-server-abba15e1c367.herokuapp.com/proxy.php?api=igdb&search=${encodeURIComponent(gameTitle)}`);
         if (!response.ok) {
             throw new Error('Network response was not ok ' + response.statusText);
         }
