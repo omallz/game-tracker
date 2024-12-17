@@ -6,8 +6,6 @@ async function fetchSheetdbData() {
             throw new Error('Network response was not ok ' + response.statusText);
         }
         const data = await response.json();
-        localStorage.setItem('sheetdbData', JSON.stringify(data));
-        localStorage.setItem('sheetdbDataTimestamp', Date.now());
         return data;
     } catch (error) {
         console.error('Error fetching data from SheetDB:', error);
@@ -115,24 +113,11 @@ function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// Function to check if cached data is still valid
-function isCacheValid() {
-    const cacheTimestamp = localStorage.getItem('sheetdbDataTimestamp');
-    const cacheExpiry = 3600000; // 1 hour in milliseconds
-    return cacheTimestamp && (Date.now() - cacheTimestamp) < cacheExpiry;
-}
-
 document.addEventListener('DOMContentLoaded', function() {
-    if (isCacheValid()) {
-        const cachedData = JSON.parse(localStorage.getItem('sheetdbData'));
-        createGameCards(cachedData);
-        updateImagesInBatches(cachedData);
-    } else {
-        fetchSheetdbData().then(data => {
-            if (data) {
-                createGameCards(data);
-                updateImagesInBatches(data);
-            }
-        }).catch(error => console.error('Error:', error));
-    }
+    fetchSheetdbData().then(data => {
+        if (data) {
+            createGameCards(data);
+            updateImagesInBatches(data);
+        }
+    }).catch(error => console.error('Error:', error));
 });
