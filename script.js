@@ -22,6 +22,17 @@ async function fetchIgdbData(gameTitle) {
         }
         const data = await response.json();
         console.log('IGDB Data for', gameTitle, data); // Log the IGDB data
+
+        if (!data || data.length === 0) {
+            console.log(`No data found for "${gameTitle}". Trying alternative queries.`);
+            // Optionally, try a simplified query or different format
+            const altTitle = gameTitle.replace(':', '');
+            const altResponse = await fetch(`https://gaming-backlog-proxy-server-abba15e1c367.herokuapp.com/proxy.php?api=igdb&search=${encodeURIComponent(altTitle)}`);
+            const altData = await altResponse.json();
+            console.log('IGDB Data for alternative title', altTitle, altData);
+            return altData;
+        }
+
         return data;
     } catch (error) {
         console.error('Error fetching data from IGDB:', error);
